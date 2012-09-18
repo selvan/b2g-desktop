@@ -1,0 +1,75 @@
+#!/usr/bin/python
+
+from BeautifulSoup import BeautifulSoup
+import urllib2
+import subprocess
+
+if __name__ == '__main__':
+
+	req = urllib2.Request("http://ftp.mozilla.org/pub/mozilla.org/b2g/nightly/latest-mozilla-central/")
+	res = urllib2.urlopen(req).read()
+
+	# res = """
+	# 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+	# 	<html>
+	# 	 <head>
+	# 	  <title>Index of /pub/mozilla.org/b2g/nightly/latest-mozilla-central</title>
+	# 	 </head>
+	# 	 <body>
+	# 	<h1>Index of /pub/mozilla.org/b2g/nightly/latest-mozilla-central</h1>
+	# 	<table><tr><th><img src="/icons/blank.gif" alt="[ICO]"></th><th><a href="?C=N;O=D">Name</a></th><th><a href="?C=M;O=A">Last modified</a></th><th><a href="?C=S;O=A">Size</a></th><th><a href="?C=D;O=A">Description</a></th></tr><tr><th colspan="5"><hr></th></tr>
+	# 	<tr><td valign="top"><img src="/icons/back.gif" alt="[DIR]"></td><td><a href="/pub/mozilla.org/b2g/nightly/">Parent Directory</a></td><td>&nbsp;</td><td align="right">  - </td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/unknown.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.linux-i686.checksums">b2g-18.0a1.en-US.linux-i686.checksums</a></td><td align="right">17-Sep-2012 03:53  </td><td align="right">1.4K</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/unknown.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.linux-i686.tar.bz2">b2g-18.0a1.en-US.linux-i686.tar.bz2</a></td><td align="right">17-Sep-2012 03:53  </td><td align="right"> 19M</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/compressed.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.linux-i686.tests.zip">b2g-18.0a1.en-US.linux-i686.tests.zip</a></td><td align="right">17-Sep-2012 03:53  </td><td align="right"> 60M</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="b2g-18.0a1.en-US.linux-i686.txt">b2g-18.0a1.en-US.linux-i686.txt</a></td><td align="right">17-Sep-2012 03:53  </td><td align="right"> 70 </td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/unknown.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.mac64.checksums">b2g-18.0a1.en-US.mac64.checksums</a></td><td align="right">17-Sep-2012 03:35  </td><td align="right">1.3K</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/unknown.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.mac64.dmg">b2g-18.0a1.en-US.mac64.dmg</a></td><td align="right">17-Sep-2012 03:35  </td><td align="right"> 15M</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/compressed.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.mac64.tests.zip">b2g-18.0a1.en-US.mac64.tests.zip</a></td><td align="right">17-Sep-2012 03:35  </td><td align="right"> 49M</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="b2g-18.0a1.en-US.mac64.txt">b2g-18.0a1.en-US.mac64.txt</a></td><td align="right">17-Sep-2012 03:35  </td><td align="right"> 70 </td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/unknown.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.win32.checksums">b2g-18.0a1.en-US.win32.checksums</a></td><td align="right">17-Sep-2012 04:47  </td><td align="right">1.4K</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/compressed.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.win32.tests.zip">b2g-18.0a1.en-US.win32.tests.zip</a></td><td align="right">17-Sep-2012 04:47  </td><td align="right"> 52M</td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="b2g-18.0a1.en-US.win32.txt">b2g-18.0a1.en-US.win32.txt</a></td><td align="right">17-Sep-2012 04:47  </td><td align="right"> 70 </td><td>&nbsp;</td></tr>
+	# 	<tr><td valign="top"><img src="/icons/compressed.gif" alt="[   ]"></td><td><a href="b2g-18.0a1.en-US.win32.zip">b2g-18.0a1.en-US.win32.zip</a></td><td align="right">17-Sep-2012 04:47  </td><td align="right"> 14M</td><td>&nbsp;</td></tr>
+	# 	<tr><th colspan="5"><hr></th></tr>
+	# 	</table>
+	# 	<pre>
+	# 	ftp1.dmz.scl3.mozilla.com in the Pacific Time Zone (PST/PDT)</pre>
+	# 	</body></html>	
+	# """
+	build_file = ""
+	build_date = ""
+	soup = BeautifulSoup(res)
+	for _tr in soup("tr"):
+		if _tr.td == None:
+			continue
+		_td = _tr.td
+		while _td.a == None :
+			_td = _td.nextSibling
+		if _td.a["href"].endswith(".linux-i686.tar.bz2"):
+			build_file = _td.a["href"]
+			build_date = _td.nextSibling.string
+
+
+	download_url = req.get_full_url() + build_file
+	print "Downloading latest B2G desktop client from => " + download_url + ", built on => " + build_date
+
+	res_file = urllib2.urlopen(download_url)
+	data = res_file.read()
+
+	cmd_rm = subprocess.Popen(["rm", "-f", build_file])
+	cmd_rm.wait()
+
+	file = open(build_file, "wb")
+	file.write(data)
+	file.close()
+
+	cmd_rm = subprocess.Popen(["rm", "-rf", "b2g"])
+	cmd_rm.wait()
+
+
+	cmd_untar = subprocess.Popen(["tar", "-jxvf", build_file])
+	cmd_untar.wait()
+
+	print "Done.."
+	print "B2G desktop client from => " + download_url + ", built on => " + build_date
